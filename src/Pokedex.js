@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
     transition: theme.transitions.create('width'),
     width: '100%',
     [theme.breakpoints.up('sm')]: {
-      width: '12ch',
+      width: '15ch',
       '&:focus': {
         width: '20ch',
       },
@@ -75,10 +75,15 @@ const Pokedex = (props) => {
   const { history } = props;
   const classes = useStyles();
   const [pokemonData, setPokemonData] = useState({});
+  const [filter, setFilter] = useState('');
+
+  const searchChangeHandler = (e) => {
+    setFilter(e.target.value);
+  };
 
   useEffect(() => {
     axios
-      .get(`https://pokeapi.co/api/v2/pokemon?limit=100`)
+      .get(`https://pokeapi.co/api/v2/pokemon?limit=500`)
       .then(function (response) {
         const { data } = response;
         const { results } = data;
@@ -121,12 +126,13 @@ const Pokedex = (props) => {
               <SearchIcon />
             </div>
             <InputBase
-              placeholder='Search…'
+              placeholder='Search Pokemon'
               classes={{
                 root: classes.inputRoot,
                 input: classes.inputInput,
               }}
               inputProps={{ 'aria-label': 'search' }}
+              onChange={searchChangeHandler}
             />
           </div>
         </Toolbar>
@@ -134,7 +140,10 @@ const Pokedex = (props) => {
       {pokemonData ? (
         <Grid container spacing={4} className={classes.pokedexContainer}>
           {Object.keys(pokemonData).map((pokemonId) => {
-            return getPokemonCard(pokemonId);
+            return (
+              pokemonData[pokemonId].name.includes(filter) &&
+              getPokemonCard(pokemonId)
+            );
           })}
         </Grid>
       ) : (
